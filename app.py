@@ -1,45 +1,99 @@
 import pandas as pd
 import streamlit as st
 
-# Configuração da página
+# Configuração da página com o ícone e título da Status / Bougainville
 st.set_page_config(
-    page_title="Portaria Bougainville",
+    page_title="Portaria - Grupo Status | Bougainville",
     page_icon="🏢",
     layout="centered"
 )
 
-# Estilização CSS para garantir cores bem visíveis
+# Estilização CSS Personalizada com as cores do Grupo Status (Azul Marinho, Verde e Dourado)
 st.markdown("""
     <style>
+    /* Esconder menus padrão do Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .main-title {
-        color: #1E3A8A !important;
+    header {visibility: hidden;}
+    
+    /* Fundo da aplicação */
+    .stApp {
+        background-color: #F4F7F9;
+    }
+
+    /* Cartão do Cabeçalho */
+    .header-card {
+        background: linear-gradient(135deg, #0A2540 0%, #00152B 100%);
+        padding: 25px;
+        border-radius: 12px;
         text-align: center;
-        font-weight: bold;
-        font-size: 32px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-bottom: 4px solid #00A859;
+        margin-bottom: 25px;
+    }
+
+    .brand-subtitle {
+        color: #D9A74A;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
         margin-bottom: 5px;
     }
+
+    .main-title {
+        color: #FFFFFF !important;
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+    }
+
     .sub-title {
-        text-align: center;
-        color: #4B5563 !important;
-        font-size: 16px;
-        margin-bottom: 25px;
+        color: #E2E8F0 !important;
+        font-size: 15px;
+        margin-top: 5px;
+    }
+
+    /* Botão de Busca e Inputs */
+    div.stButton > button {
+        background-color: #00A859 !important;
+        color: white !important;
+        font-weight: bold;
+        border-radius: 8px;
+        border: none;
+    }
+
+    /* Barra Lateral */
+    [data-testid="stSidebar"] {
+        background-color: #0A2540;
+        color: white;
+    }
+
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
+        color: white !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Cabeçalho
-st.markdown("<h1 class='main-title'>🏢 Portaria Bougainville</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-title'>Sistema de Consulta de Acesso e Lotes Embargados</p>", unsafe_allow_html=True)
-st.markdown("---")
+# Cabeçalho Estilizado do Grupo Status / Bougainville
+st.markdown("""
+    <div class="header-card">
+        <div class="brand-subtitle">GRUPO STATUS • CONSTRUÇÃO E INCORPORAÇÃO</div>
+        <div class="main-title">🏢 PORTARIA BOUGAINVILLE</div>
+        <div class="sub-title">Controle de Acesso de Prestadores e Lotes Embargados</div>
+    </div>
+""", unsafe_allow_html=True)
 
 # Barra Lateral Informativa
 with st.sidebar:
-    st.header("⚙️ Suporte & Central")
-    st.info("Caso haja divergências ou dúvidas sobre embargos, entre em contato com a Administração.")
-    st.write("📞 **Telefone:** (00) 00000-0000")
-    st.write("📧 **E-mail:** financeiro@bougainville.com")
+    st.markdown("### ⚙️ Central de Suporte")
+    st.markdown("**Grupo Status / Administração**")
+    st.info("Para divergências de acesso, pagamentos ou liberação de embargos, oriente o visitante a contactar a administração.")
+    st.markdown("---")
+    st.markdown("📞 **Telefone:** (91) 3210-0000")
+    st.markdown("📧 **E-mail:** atendimento@grupostatus.com.br")
+    st.markdown("🌐 **Website:** [grupostatus.com.br](https://www.grupostatus.com.br)")
 
 # Carregamento do banco de dados Excel
 @st.cache_data(ttl=60)
@@ -54,7 +108,7 @@ def carregar_dados():
 try:
     lotes_df, embargos_df = carregar_dados()
 except Exception:
-    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo foi enviado corretamente ao GitHub com o nome exato 'dados.xlsx'.")
+    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está salvo com o nome correto no GitHub.")
     st.stop()
 
 # Campo de busca
@@ -72,7 +126,7 @@ if busca:
         st.write(f"👤 **Cliente:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         st.write(f"📅 **Atraso desde:** {d['Atraso desde']}")
-        st.warning("⚠️ **Orientação:** Orientar o visitante/prestador a procurar a administração do condomínio.")
+        st.warning("⚠️ **Orientação:** Solicitar ao visitante que se dirija à Administração do Grupo Status.")
 
     elif not lote.empty:
         d = lote.iloc[0]
