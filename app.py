@@ -1,99 +1,127 @@
 import pandas as pd
 import streamlit as st
 
-# Configuração da página com o ícone e título da Status / Bougainville
+# Configuração da página
 st.set_page_config(
-    page_title="Portaria - Grupo Status | Bougainville",
+    page_title="Bougainville Belém | Grupo Status",
     page_icon="🏢",
     layout="centered"
 )
 
-# Estilização CSS Personalizada com as cores do Grupo Status (Azul Marinho, Verde e Dourado)
+# Estilização CSS inspirada no site do Grupo Status / Bougainville Belém
 st.markdown("""
     <style>
-    /* Esconder menus padrão do Streamlit */
+    /* Ocultar menus nativos */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Fundo da aplicação */
+    /* Fundo da aplicação em Azul Escuro Institucional */
     .stApp {
-        background-color: #F4F7F9;
+        background-color: #001C38;
+        color: #FFFFFF;
     }
 
-    /* Cartão do Cabeçalho */
-    .header-card {
-        background: linear-gradient(135deg, #0A2540 0%, #00152B 100%);
-        padding: 25px;
-        border-radius: 12px;
-        text-align: center;
-        color: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border-bottom: 4px solid #00A859;
-        margin-bottom: 25px;
+    /* Topo com marca e slogan */
+    .brand-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 20px;
     }
 
-    .brand-subtitle {
-        color: #D9A74A;
-        font-size: 13px;
+    .brand-title {
+        font-size: 14px;
         font-weight: 700;
         letter-spacing: 2px;
+        color: #FFFFFF;
         text-transform: uppercase;
+    }
+
+    .portal-tag {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid #FFFFFF;
+        color: #FFFFFF;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Cartão Principal do Título */
+    .hero-container {
+        text-align: center;
+        padding: 20px 10px 30px 10px;
+    }
+
+    .hero-title {
+        color: #FFFFFF !important;
+        font-size: 34px;
+        font-weight: 800;
         margin-bottom: 5px;
     }
 
-    .main-title {
+    .hero-slogan {
+        color: #8BA0B5 !important;
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 20px;
+        font-style: italic;
+    }
+
+    /* Caixas brancas para os campos e resultados */
+    .card-box {
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        padding: 25px;
+        color: #1E293B;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        margin-top: 15px;
+    }
+
+    /* Personalização de rótulos de entrada */
+    .stTextInput > label {
         color: #FFFFFF !important;
-        font-size: 28px;
-        font-weight: bold;
-        margin: 0;
+        font-size: 16px !important;
+        font-weight: 600 !important;
     }
 
-    .sub-title {
-        color: #E2E8F0 !important;
-        font-size: 15px;
-        margin-top: 5px;
-    }
-
-    /* Botão de Busca e Inputs */
-    div.stButton > button {
-        background-color: #00A859 !important;
-        color: white !important;
-        font-weight: bold;
-        border-radius: 8px;
-        border: none;
-    }
-
-    /* Barra Lateral */
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #0A2540;
-        color: white;
+        background-color: #001326;
     }
-
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
-        color: white !important;
+    [data-testid="stSidebar"] * {
+        color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Cabeçalho Estilizado do Grupo Status / Bougainville
+# Barra Superior de Identidade
 st.markdown("""
-    <div class="header-card">
-        <div class="brand-subtitle">GRUPO STATUS • CONSTRUÇÃO E INCORPORAÇÃO</div>
-        <div class="main-title">🏢 PORTARIA BOUGAINVILLE</div>
-        <div class="sub-title">Controle de Acesso de Prestadores e Lotes Embargados</div>
+    <div class="brand-bar">
+        <div class="brand-title">S GRUPO STATUS</div>
+        <div class="portal-tag">PORTAL DE PORTARIA</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Título Principal do Empreendimento
+st.markdown("""
+    <div class="hero-container">
+        <div class="hero-title">Bougainville Belém</div>
+        <div class="hero-slogan">Construímos hoje pensando no amanhã!</div>
     </div>
 """, unsafe_allow_html=True)
 
 # Barra Lateral Informativa
 with st.sidebar:
-    st.markdown("### ⚙️ Central de Suporte")
-    st.markdown("**Grupo Status / Administração**")
-    st.info("Para divergências de acesso, pagamentos ou liberação de embargos, oriente o visitante a contactar a administração.")
+    st.markdown("### ⚙️ Central do Cliente")
+    st.markdown("**Grupo Status**")
+    st.info("Para dúvidas ou regularização de embargos, oriente o visitante a entrar em contato com a administração.")
     st.markdown("---")
-    st.markdown("📞 **Telefone:** (91) 3210-0000")
-    st.markdown("📧 **E-mail:** atendimento@grupostatus.com.br")
-    st.markdown("🌐 **Website:** [grupostatus.com.br](https://www.grupostatus.com.br)")
+    st.markdown("📞 **Atendimento:** (91) 3210-0000")
+    st.markdown("🌐 **Site:** [grupostatus.com.br](https://www.grupostatus.com.br)")
 
 # Carregamento do banco de dados Excel
 @st.cache_data(ttl=60)
@@ -108,10 +136,10 @@ def carregar_dados():
 try:
     lotes_df, embargos_df = carregar_dados()
 except Exception:
-    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está salvo com o nome correto no GitHub.")
+    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está no GitHub com o nome exato 'dados.xlsx'.")
     st.stop()
 
-# Campo de busca
+# Campo de busca do porteiro
 busca = st.text_input("🔍 Digite o Lote-Quadra para consultar (Ex: 19-62):", "").strip().upper()
 
 if busca:
