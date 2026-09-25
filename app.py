@@ -8,7 +8,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Estilização CSS com a imagem de fundo e o logótipo oficial
+# Estilização CSS com a imagem de fundo e ajustes de tamanho do logótipo
 st.markdown("""
     <style>
     /* Ocultar menus nativos */
@@ -18,7 +18,7 @@ st.markdown("""
     
     /* Configuração da Imagem de Fundo */
     .stApp {
-        background: linear-gradient(rgba(0, 28, 56, 0.78), rgba(0, 28, 56, 0.88)), 
+        background: linear-gradient(rgba(0, 28, 56, 0.70), rgba(0, 28, 56, 0.85)), 
                     url("https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/fundo.jpg");
         background-size: cover;
         background-position: center;
@@ -36,8 +36,9 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
+    /* Logótipo aumentado de 45px para 65px */
     .brand-logo {
-        height: 45px;
+        height: 65px;
         width: auto;
     }
 
@@ -60,10 +61,10 @@ st.markdown("""
 
     .hero-title {
         color: #FFFFFF !important;
-        font-size: 34px;
+        font-size: 36px;
         font-weight: 800;
         margin-bottom: 5px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.6);
     }
 
     .hero-slogan {
@@ -72,10 +73,17 @@ st.markdown("""
         font-weight: 400;
         margin-bottom: 20px;
         font-style: italic;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
-    /* Estilização do rótulo do campo de entrada */
+    /* Ajuste de contraste para o campo de entrada */
+    .stTextInput input {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+
     .stTextInput > label {
         color: #FFFFFF !important;
         font-size: 16px !important;
@@ -149,7 +157,8 @@ if busca:
         st.write(f"👤 **Cliente:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         st.write(f"📅 **Atraso desde:** {d['Atraso desde']}")
-        st.warning("⚠️ **Orientação:** Solicitar ao visitante que se dirija à Administração do Grupo Status.")
+        # DIGITE O NOVO TEXTO DA CAIXA AMARELA ABAIXO:
+        st.warning("⚠️ **Orientação:** Escreva aqui o novo texto que deseja exibir na caixa amarela.")
 
     elif not lote.empty:
         d = lote.iloc[0]
