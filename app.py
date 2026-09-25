@@ -153,7 +153,7 @@ if busca:
 
     if not embargo.empty:
         d = embargo.iloc[0]
-        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO**")
+        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUEADO**")
         st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
