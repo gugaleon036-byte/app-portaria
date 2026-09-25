@@ -156,12 +156,6 @@ if busca:
         st.error("🚨 **STATUS DO LOTE: EMBARGADO / INADIMPLENTE**")
         st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
-        
-        # Caixa Amarela de Orientação Atualizada
-        st.warning(
-            "⚠️ **ORIENTAÇÃO PARA A PORTARIA:**\n\n"
-            "• **SE O MORADOR JÁ RESIDIR/HABITAR NO LOTE:** Acesso **TOTALMENTE LIBERADO** (incluindo o morador, visitas, prestadores de serviço e entrega de materiais)."
-        )
 
     elif not lote.empty:
         d = lote.iloc[0]
