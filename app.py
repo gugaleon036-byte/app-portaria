@@ -8,7 +8,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Estilização CSS com a imagem de fundo e ajustes de tamanho do logótipo
+# Estilização CSS com a imagem de fundo e logo aumentada em 2x
 st.markdown("""
     <style>
     /* Ocultar menus nativos */
@@ -36,9 +36,9 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Logótipo aumentado de 45px para 65px */
+    /* Logótipo aumentado em 2x (de 75px para 150px) */
     .brand-logo {
-        height: 65px;
+        height: 150px;
         width: auto;
     }
 
@@ -76,7 +76,7 @@ st.markdown("""
         text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
-    /* Ajuste de contraste para o campo de entrada */
+    /* Campo de entrada de texto */
     .stTextInput input {
         background-color: #FFFFFF !important;
         color: #1E293B !important;
@@ -101,7 +101,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Barra Superior de Identidade com a imagem da Logo
+# Barra Superior de Identidade com a Logo em Dobro de Tamanho
 st.markdown("""
     <div class="brand-bar">
         <img src="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png" class="brand-logo" alt="Grupo Status">
@@ -109,7 +109,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Título Principal do Empreendimento
+# Título Principal
 st.markdown("""
     <div class="hero-container">
         <div class="hero-title">Bougainville Belém</div>
@@ -121,12 +121,12 @@ st.markdown("""
 with st.sidebar:
     st.markdown("### ⚙️ Central do Cliente")
     st.markdown("**Grupo Status**")
-    st.info("Para dúvidas ou regularização de embargos, oriente o visitante a entrar em contato com a administração.")
+    st.info("Para dúvidas ou regularização de embargos, oriente o cliente a entrar em contato com a administração.")
     st.markdown("---")
     st.markdown("📞 **Atendimento:** (91) 3210-0000")
     st.markdown("🌐 **Site:** [grupostatus.com.br](https://www.grupostatus.com.br)")
 
-# Carregamento do banco de dados Excel
+# Carregamento dos dados
 @st.cache_data(ttl=60)
 def carregar_dados():
     lotes = pd.read_excel("dados.xlsx", sheet_name="Lote Entregues", skiprows=4)
@@ -153,16 +153,20 @@ if busca:
 
     if not embargo.empty:
         d = embargo.iloc[0]
-        st.error("🚨 **STATUS: EMBARGADO - ACESSO NÃO LIBERADO**")
-        st.write(f"👤 **Cliente:** {d['Nome do Cliente']}")
+        st.error("🚨 **STATUS DO LOTE: EMBARGADO / INADIMPLENTE**")
+        st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
-        st.write(f"📅 **Atraso desde:** {d['Atraso desde']}")
-        # DIGITE O NOVO TEXTO DA CAIXA AMARELA ABAIXO:
-        st.warning("⚠️ **Orientação:** Escreva aqui o novo texto que deseja exibir na caixa amarela.")
+        
+        # Caixa Amarela de Orientação para Morador vs Obra
+        st.warning(
+            "⚠️ **ORIENTAÇÃO PARA A PORTARIA:**\n\n"
+            "• **SE O MORADOR JÁ RESIDIR/HABITAR NO LOTE:** Acesso **TOTALMENTE LIBERADO** (incluindo o morador, visitas, prestadores de serviço e entrega de materiais).\n\n"
+            "• **SE FOR OBRA EM ANDAMENTO (SEM MORADOR RESIDINDO):** Entrada **BLOQUEADA / EMBARGADA** para prestadores de serviço, equipes de obra e entrega de materiais."
+        )
 
     elif not lote.empty:
         d = lote.iloc[0]
-        st.success("✅ **STATUS: LIBERADO - ACESSO PERMITIDO**")
+        st.success("✅ **STATUS: LIBERADO - ACESSO TOTAL PERMITIDO**")
         st.write(f"👤 **Proprietário:** {d['PROPRIETÁRIO']}")
         st.write(f"📍 **Setor:** {d['SETOR']}")
 
