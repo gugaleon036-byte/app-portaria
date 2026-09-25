@@ -8,7 +8,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Estilização CSS inspirada no site do Grupo Status / Bougainville Belém
+# Estilização CSS com a imagem de fundo e o logótipo oficial
 st.markdown("""
     <style>
     /* Ocultar menus nativos */
@@ -16,44 +16,46 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Fundo da aplicação em Azul Escuro Institucional */
+    /* Configuração da Imagem de Fundo */
     .stApp {
-        background-color: #001C38;
+        background: linear-gradient(rgba(0, 28, 56, 0.78), rgba(0, 28, 56, 0.88)), 
+                    url("https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/fundo.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         color: #FFFFFF;
     }
 
-    /* Topo com marca e slogan */
+    /* Topo com o Logótipo e a Tag do Portal */
     .brand-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 0 20px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         margin-bottom: 20px;
     }
 
-    .brand-title {
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        color: #FFFFFF;
-        text-transform: uppercase;
+    .brand-logo {
+        height: 45px;
+        width: auto;
     }
 
     .portal-tag {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.15);
         border: 1px solid #FFFFFF;
         color: #FFFFFF;
-        padding: 5px 15px;
+        padding: 6px 16px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        letter-spacing: 0.5px;
     }
 
-    /* Cartão Principal do Título */
+    /* Cartão do Título */
     .hero-container {
         text-align: center;
-        padding: 20px 10px 30px 10px;
+        padding: 10px 10px 20px 10px;
     }
 
     .hero-title {
@@ -61,36 +63,29 @@ st.markdown("""
         font-size: 34px;
         font-weight: 800;
         margin-bottom: 5px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .hero-slogan {
-        color: #8BA0B5 !important;
+        color: #E2E8F0 !important;
         font-size: 16px;
         font-weight: 400;
         margin-bottom: 20px;
         font-style: italic;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
-    /* Caixas brancas para os campos e resultados */
-    .card-box {
-        background-color: #FFFFFF;
-        border-radius: 12px;
-        padding: 25px;
-        color: #1E293B;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        margin-top: 15px;
-    }
-
-    /* Personalização de rótulos de entrada */
+    /* Estilização do rótulo do campo de entrada */
     .stTextInput > label {
         color: #FFFFFF !important;
         font-size: 16px !important;
         font-weight: 600 !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
 
     /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #001326;
+        background-color: rgba(0, 19, 38, 0.95);
     }
     [data-testid="stSidebar"] * {
         color: #FFFFFF !important;
@@ -98,10 +93,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Barra Superior de Identidade
+# Barra Superior de Identidade com a imagem da Logo
 st.markdown("""
     <div class="brand-bar">
-        <div class="brand-title">S GRUPO STATUS</div>
+        <img src="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png" class="brand-logo" alt="Grupo Status">
         <div class="portal-tag">PORTAL DE PORTARIA</div>
     </div>
 """, unsafe_allow_html=True)
