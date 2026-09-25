@@ -1,12 +1,10 @@
 import pandas as pd
 import streamlit as st
 
-# Título do App
 st.set_page_config(page_title="Portaria Bougainville", page_icon="🛡️")
 st.title("🛡️ Portaria Bougainville")
 
 
-# Ler a planilha
 @st.cache_data
 def carregar_dados():
     lotes = pd.read_excel("dados.xlsx", sheet_name="Lote Entregues", skiprows=4)
@@ -19,7 +17,6 @@ def carregar_dados():
 
 lotes_df, embargos_df = carregar_dados()
 
-# Caixa de busca
 busca = (
     st.text_input("🔍 Digite o Lote-Quadra (Ex: 19-62):", "")
     .strip()
