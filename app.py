@@ -153,9 +153,12 @@ if busca:
 
     if not embargo.empty:
         d = embargo.iloc[0]
-        st.error("🚨 **STATUS DO LOTE: EMBARGADO / INADIMPLENTE**")
+        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO**")
         st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
+        
+        # Caixa Amarela de Orientação
+        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND")
 
     elif not lote.empty:
         d = lote.iloc[0]
