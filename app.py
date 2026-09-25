@@ -8,7 +8,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Estilização CSS com a imagem de fundo e logo aumentada em 2x
+# Estilização CSS com a imagem de fundo e logo em destaque
 st.markdown("""
     <style>
     /* Ocultar menus nativos */
@@ -36,7 +36,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Logótipo aumentado em 2x (de 75px para 150px) */
+    /* Logótipo em destaque */
     .brand-logo {
         height: 150px;
         width: auto;
@@ -101,7 +101,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Barra Superior de Identidade com a Logo em Dobro de Tamanho
+# Barra Superior de Identidade
 st.markdown("""
     <div class="brand-bar">
         <img src="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png" class="brand-logo" alt="Grupo Status">
@@ -157,11 +157,10 @@ if busca:
         st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
-        # Caixa Amarela de Orientação para Morador vs Obra
+        # Caixa Amarela de Orientação Atualizada
         st.warning(
             "⚠️ **ORIENTAÇÃO PARA A PORTARIA:**\n\n"
-            "• **SE O MORADOR JÁ RESIDIR/HABITAR NO LOTE:** Acesso **TOTALMENTE LIBERADO** (incluindo o morador, visitas, prestadores de serviço e entrega de materiais).\n\n"
-            "• **SE FOR OBRA EM ANDAMENTO (SEM MORADOR RESIDINDO):** Entrada **BLOQUEADA / EMBARGADA** para prestadores de serviço, equipes de obra e entrega de materiais."
+            "• **SE O MORADOR JÁ RESIDIR/HABITAR NO LOTE:** Acesso **TOTALMENTE LIBERADO** (incluindo o morador, visitas, prestadores de serviço e entrega de materiais)."
         )
 
     elif not lote.empty:
