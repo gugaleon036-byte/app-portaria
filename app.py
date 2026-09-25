@@ -8,30 +8,28 @@ st.set_page_config(
     layout="centered"
 )
 
-# Estilização CSS personalizada
+# Estilização CSS para garantir cores bem visíveis
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    .stApp {
-        background-color: #F8F9FA;
-    }
     .main-title {
-        color: #1E3A8A;
+        color: #1E3A8A !important;
         text-align: center;
         font-weight: bold;
+        font-size: 32px;
         margin-bottom: 5px;
     }
     .sub-title {
         text-align: center;
-        color: #6C757D;
+        color: #4B5563 !important;
         font-size: 16px;
         margin-bottom: 25px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Cabeçalho do App
+# Cabeçalho
 st.markdown("<h1 class='main-title'>🏢 Portaria Bougainville</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>Sistema de Consulta de Acesso e Lotes Embargados</p>", unsafe_allow_html=True)
 st.markdown("---")
@@ -44,7 +42,7 @@ with st.sidebar:
     st.write("📧 **E-mail:** financeiro@bougainville.com")
 
 # Carregamento do banco de dados Excel
-@st.cache_data(ttl=60)  # Recarrega a planilha a cada 1 minuto
+@st.cache_data(ttl=60)
 def carregar_dados():
     lotes = pd.read_excel("dados.xlsx", sheet_name="Lote Entregues", skiprows=4)
     embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos", skiprows=1)
@@ -56,10 +54,10 @@ def carregar_dados():
 try:
     lotes_df, embargos_df = carregar_dados()
 except Exception:
-    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se ele foi enviado corretamente ao GitHub.")
+    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo foi enviado corretamente ao GitHub com o nome exato 'dados.xlsx'.")
     st.stop()
 
-# Campo de busca do porteiro
+# Campo de busca
 busca = st.text_input("🔍 Digite o Lote-Quadra para consultar (Ex: 19-62):", "").strip().upper()
 
 if busca:
