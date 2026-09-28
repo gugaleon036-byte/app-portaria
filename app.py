@@ -1,12 +1,12 @@
 import pandas as pd
 import streamlit as st
 
-# URL da Nova Logo Bougainville Belém - Portaria
-LOGO_URL = "https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo_portaria.png"
+# URL da Logo do Grupo Status
+LOGO_URL = "https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png"
 
 # Configuração da página e ícone da aba
 st.set_page_config(
-    page_title="Bougainville Belém | Portaria",
+    page_title="Bougainville Belém | Grupo Status",
     page_icon=LOGO_URL,
     layout="centered"
 )
@@ -45,11 +45,11 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Logótipo do aplicativo em destaque */
+    /* Logótipo do Grupo Status em destaque */
     .brand-logo {
         height: 150px;
         width: auto;
-        border-radius: 18px; /* Arredondamento suave acompanhando a logo */
+        object-fit: contain;
     }
 
     .portal-tag {
@@ -114,7 +114,7 @@ st.markdown("""
 # Barra Superior de Identidade
 st.markdown(f"""
     <div class="brand-bar">
-        <img src="{LOGO_URL}" class="brand-logo" alt="Bougainville Belém Portaria">
+        <img src="{LOGO_URL}" class="brand-logo" alt="Grupo Status">
         <div class="portal-tag">PORTAL DE PORTARIA</div>
     </div>
 """, unsafe_allow_html=True)
@@ -168,7 +168,7 @@ if busca:
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
         # Caixa Amarela de Orientação
-        st.warning("⚠️ **Orientação ao cliente:** PROCURE INFORMAÇÕES NO STAND")
+        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND")
 
     elif not lote.empty:
         d = lote.iloc[0]
