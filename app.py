@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 import streamlit as st
 
@@ -10,6 +11,14 @@ st.set_page_config(
 )
 
 st.title("Sistema de Consulta de Acesso - Portaria (Bougainville)")
+
+
+# Função para padronizar qualquer formato de texto de lote/quadra
+def normalizar_texto(texto):
+  if pd.isna(texto):
+    return ""
+  # Remove traços, barras, pontos e espaços para comparar apenas números e letras
+  return re.sub(r"[^a-zA-Z0-9]", "", str(texto)).upper().strip()
 
 
 # Função para encontrar a coluna de Lote/Quadra dinamicamente
@@ -48,12 +57,14 @@ def carregar_dados():
         identificar_coluna_lote(df_embargos) if not df_embargos.empty else None
     )
 
-    df_entregues[col_entregues] = (
-        df_entregues[col_entregues].astype(str).str.strip()
+    # Cria uma coluna de busca padronizada sem símbolos
+    df_entregues["BUSCA_NORMALIZADA"] = df_entregues[col_entregues].apply(
+        normalizar_texto
     )
+
     if col_embargos and col_embargos in df_embargos.columns:
-      df_embargos[col_embargos] = (
-          df_embargos[col_embargos].astype(str).str.strip()
+      df_embargos["BUSCA_NORMALIZADA"] = df_embargos[col_embargos].apply(
+          normalizar_texto
       )
 
     return df_entregues, df_embargos, col_entregues, col_embargos
@@ -62,36 +73,53 @@ def carregar_dados():
     return None, None, None, None
 
 
-# Botão no topo para forçar o recarregamento dos dados do GitHub
+# Botão para forçar atualização do cache
 if st.button("🔄 Recarregar / Atualizar Planilha"):
   st.cache_data.clear()
-  st.success("Memória atualizada! A carregar novos dados...")
+  st.success("Memória atualizada com sucesso!")
   st.rerun()
 
 # Carrega as tabelas
 df_entregues, df_embargos, col_entregues, col_embargos = carregar_dados()
 
 if df_entregues is not None:
-  lote_busca = st.text_input(
+  lote_busca_raw = st.text_input(
       "Digite o Quadra-Lote (Exemplo: 27-1):", ""
   ).strip()
 
-  if lote_busca:
-    embargado = pd.DataFrame()
-    if df_embargos is not None and not df_embargos.empty and col_embargos:
-      embargado = df_embargos[df_embargos[col_embargos] == lote_busca]
+  if lote_busca_raw:
+    lote_busca = normalizar_texto(lote_busca_raw)
 
+    embargado = pd.DataFrame()
+    if (
+        df_embargos is not None
+        and not df_embargos.empty
+        and "BUSCA_NORMALIZADA" in df_embargos.columns
+    ):
+      embargado = df_embargos[df_embargos["BUSCA_NORMALIZADA"] == lote_busca]
+
+    # Prioridade 1: Embargo
     if not embargado.empty:
       st.error("🚨 ATENÇÃO: LOTE EMBARGADO / ACESSO BLOQUEADO")
       st.markdown("### Detalhes do Bloqueio:")
-      st.dataframe(embargado, use_container_width=True)
+      # Exibe sem mostrar a coluna técnica interna
+      st.dataframe(
+          embargado.drop(columns=["BUSCA_NORMALIZADA"], errors="ignore"),
+          use_container_width=True,
+      )
     else:
-      entregue = df_entregues[df_entregues[col_entregues] == lote_busca]
+      # Prioridade 2: Liberado
+      entregue = df_entregues[
+          df_entregues["BUSCA_NORMALIZADA"] == lote_busca
+      ]
 
       if not entregue.empty:
         st.success("✅ ACESSO LIBERADO")
         st.markdown("### Informações do Lote:")
-        st.dataframe(entregue, use_container_width=True)
+        st.dataframe(
+            entregue.drop(columns=["BUSCA_NORMALIZADA"], errors="ignore"),
+            use_container_width=True,
+        )
       else:
         st.warning(
             "⚠️ ATENÇÃO: Lote não encontrado na base de entregues/liberados."
