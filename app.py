@@ -1,17 +1,20 @@
 import pandas as pd
 import streamlit as st
 
-# Configuração da página com o ícone do Grupo Status na aba/navegador
+# URL da Nova Logo Bougainville Belém - Portaria
+LOGO_URL = "https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo_portaria.png"
+
+# Configuração da página e ícone da aba
 st.set_page_config(
-    page_title="Bougainville Belém | Grupo Status",
-    page_icon="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png",
+    page_title="Bougainville Belém | Portaria",
+    page_icon=LOGO_URL,
     layout="centered"
 )
 
-# Injeção de tags para ícones e favicon sem a tag <head>
-st.markdown("""
-    <link rel="shortcut icon" href="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png">
+# Injeção de tags para o ícone do PWA / Atalho no navegador
+st.markdown(f"""
+    <link rel="shortcut icon" href="{LOGO_URL}">
+    <link rel="apple-touch-icon" href="{LOGO_URL}">
 """, unsafe_allow_html=True)
 
 # Estilização CSS
@@ -42,10 +45,11 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Logótipo em destaque */
+    /* Logótipo do aplicativo em destaque */
     .brand-logo {
         height: 150px;
         width: auto;
+        border-radius: 18px; /* Arredondamento suave acompanhando a logo */
     }
 
     .portal-tag {
@@ -108,9 +112,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Barra Superior de Identidade
-st.markdown("""
+st.markdown(f"""
     <div class="brand-bar">
-        <img src="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png" class="brand-logo" alt="Grupo Status">
+        <img src="{LOGO_URL}" class="brand-logo" alt="Bougainville Belém Portaria">
         <div class="portal-tag">PORTAL DE PORTARIA</div>
     </div>
 """, unsafe_allow_html=True)
@@ -164,7 +168,7 @@ if busca:
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
         # Caixa Amarela de Orientação
-        st.warning("⚠️ **Orientação:** PROCURE INFORMAÇÕES NO STAND")
+        st.warning("⚠️ **Orientação ao cliente:** PROCURE INFORMAÇÕES NO STAND")
 
     elif not lote.empty:
         d = lote.iloc[0]
