@@ -4,7 +4,7 @@ import streamlit as st
 # Configuração da página
 st.set_page_config(
     page_title="Bougainville Belém | Grupo Status",
-    page_icon="🏢",
+    page_icon="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png",
     layout="centered"
 )
 
