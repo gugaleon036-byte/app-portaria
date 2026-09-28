@@ -3,10 +3,10 @@ import pandas as pd
 import streamlit as st
 
 # Configuração da página
-st.set_page_config(
-    page_title="Portaria Bougainville - Grupo Status",
-    page_icon="🏢",
-    layout="centered",
+def carregar_dados():
+  if not os.path.exists('dados.xlsx'):
+    st.error('Arquivo dados.xlsx não encontrado no GitHub.')
+    return None, None
 )
 
 st.title("Sistema de Consulta de Acesso - Portaria (Bougainville)")
