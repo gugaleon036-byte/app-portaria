@@ -3,36 +3,49 @@ import pandas as pd
 import streamlit as st
 
 # Configuração da página
-def carregar_dados():
-  if not os.path.exists('dados.xlsx'):
-    st.error('Arquivo dados.xlsx não encontrado no GitHub.')
-    return None, None
+st.set_page_config(
+    page_title="Portaria Bougainville - Grupo Status",
+    page_icon="🏢",
+    layout="centered",
 )
 
 st.title("Sistema de Consulta de Acesso - Portaria (Bougainville)")
 
 
-# Função para carregar as bases de dados locais
+# Função para carregar as bases de dados
 @st.cache_data(ttl=60)
 def carregar_dados():
   if not os.path.exists("dados.xlsx"):
     st.error(
-        "Arquivo 'dados.xlsx' não encontrado na raiz do repositório. Por favor,"
-        " verifique o envio do arquivo no GitHub."
+        "Arquivo 'dados.xlsx' não encontrado no GitHub. Verifique se o arquivo"
+        " foi enviado para a raiz do repositório."
     )
     return None, None
 
   try:
-    df_entregues = pd.read_excel("dados.xlsx", sheet_name="Lotes Entregues")
-    df_embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos")
+    # Detecta automaticamente os nomes das abas
+    excel = pd.ExcelFile("dados.xlsx")
+    sheet_names = excel.sheet_names
 
-    # Padronização das colunas
-    df_entregues["LOTE_QUADRA"] = (
-        df_entregues["LOTE_QUADRA"].astype(str).str.strip()
-    )
-    df_embargos["LOTE_QUADRA"] = (
-        df_embargos["LOTE_QUADRA"].astype(str).str.strip()
-    )
+    # Lê a 1ª aba (Lotes Entregues) e a aba de Embargos se existir
+    df_entregues = pd.read_excel("dados.xlsx", sheet_name=sheet_names[0])
+
+    if "Embargos" in sheet_names:
+      df_embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos")
+    elif len(sheet_names) > 1:
+      df_embargos = pd.read_excel("dados.xlsx", sheet_name=sheet_names[1])
+    else:
+      df_embargos = pd.DataFrame(columns=["LOTE_QUADRA"])
+
+    # Padronização da coluna de busca
+    if "LOTE_QUADRA" in df_entregues.columns:
+      df_entregues["LOTE_QUADRA"] = (
+          df_entregues["LOTE_QUADRA"].astype(str).str.strip()
+      )
+    if "LOTE_QUADRA" in df_embargos.columns:
+      df_embargos["LOTE_QUADRA"] = (
+          df_embargos["LOTE_QUADRA"].astype(str).str.strip()
+      )
 
     return df_entregues, df_embargos
   except Exception as e:
@@ -40,7 +53,7 @@ def carregar_dados():
     return None, None
 
 
-# Carrega os dados da planilha local
+# Carrega os dados da planilha
 df_entregues, df_embargos = carregar_dados()
 
 if df_entregues is not None and df_embargos is not None:
