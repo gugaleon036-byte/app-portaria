@@ -164,7 +164,7 @@ if busca:
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
         # Caixa Amarela de Orientação
-        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND")
+        st.warning("⚠️ **Orientação:** PROCURE INFORMAÇÕES NO STAND")
 
     elif not lote.empty:
         d = lote.iloc[0]
