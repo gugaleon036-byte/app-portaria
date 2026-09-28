@@ -1,181 +1,101 @@
+import os
 import pandas as pd
 import streamlit as st
 
-# URL da Logo do Grupo Status
-LOGO_URL = "https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png"
-
-# Configuração da página e ícone da aba
+# Configuração da página
 st.set_page_config(
-    page_title="Bougainville Belém | Grupo Status",
-    page_icon=LOGO_URL,
-    layout="centered"
+    page_title="Portaria Bougainville - Grupo Status",
+    page_icon="🏢",
+    layout="centered",
 )
 
-# Injeção de tags para o ícone do PWA / Atalho no navegador
-st.markdown(f"""
-    <link rel="shortcut icon" href="{LOGO_URL}">
-    <link rel="apple-touch-icon" href="{LOGO_URL}">
-""", unsafe_allow_html=True)
+st.title("Sistema de Consulta de Acesso - Portaria (Bougainville)")
 
-# Estilização CSS
-st.markdown("""
-    <style>
-    /* Ocultar menus nativos */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Configuração da Imagem de Fundo */
-    .stApp {
-        background: linear-gradient(rgba(0, 28, 56, 0.70), rgba(0, 28, 56, 0.85)), 
-                    url("https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/fundo.jpg");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #FFFFFF;
-    }
 
-    /* Topo com o Logótipo e a Tag do Portal */
-    .brand-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0 20px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        margin-bottom: 20px;
-    }
+# Função para encontrar a coluna de Lote/Quadra dinamicamente
+def identificar_coluna_lote(df):
+  for col in df.columns:
+    col_limpa = (
+        str(col).upper().replace("_", "").replace("-", "").replace(" ", "")
+    )
+    if "LOTE" in col_limpa or "QUADRA" in col_limpa:
+      return col
+  return df.columns[0]
 
-    /* Logótipo do Grupo Status em destaque */
-    .brand-logo {
-        height: 150px;
-        width: auto;
-        object-fit: contain;
-    }
 
-    .portal-tag {
-        background-color: rgba(255, 255, 255, 0.15);
-        border: 1px solid #FFFFFF;
-        color: #FFFFFF;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    /* Cartão do Título */
-    .hero-container {
-        text-align: center;
-        padding: 10px 10px 20px 10px;
-    }
-
-    .hero-title {
-        color: #FFFFFF !important;
-        font-size: 36px;
-        font-weight: 800;
-        margin-bottom: 5px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .hero-slogan {
-        color: #E2E8F0 !important;
-        font-size: 16px;
-        font-weight: 400;
-        margin-bottom: 20px;
-        font-style: italic;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    }
-
-    /* Campo de entrada de texto */
-    .stTextInput input {
-        background-color: #FFFFFF !important;
-        color: #1E293B !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-
-    .stTextInput > label {
-        color: #FFFFFF !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    }
-
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: rgba(0, 19, 38, 0.95);
-    }
-    [data-testid="stSidebar"] * {
-        color: #FFFFFF !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Barra Superior de Identidade
-st.markdown(f"""
-    <div class="brand-bar">
-        <img src="{LOGO_URL}" class="brand-logo" alt="Grupo Status">
-        <div class="portal-tag">PORTAL DE PORTARIA</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Título Principal
-st.markdown("""
-    <div class="hero-container">
-        <div class="hero-title">Bougainville Belém</div>
-        <div class="hero-slogan">Construímos hoje pensando no amanhã!</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Barra Lateral Informativa
-with st.sidebar:
-    st.markdown("### ⚙️ Central do Cliente")
-    st.markdown("**Grupo Status**")
-    st.info("Para dúvidas ou regularização de embargos, oriente o cliente a entrar em contato com a administração.")
-    st.markdown("---")
-    st.markdown("📞 **Atendimento:** (91) 3210-0000")
-    st.markdown("🌐 **Site:** [grupostatus.com.br](https://www.grupostatus.com.br)")
-
-# Carregamento dos dados
+# Função de carregamento das bases
 @st.cache_data(ttl=60)
 def carregar_dados():
-    lotes = pd.read_excel("dados.xlsx", sheet_name="Lote Entregues", skiprows=4)
-    embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos", skiprows=1)
+  if not os.path.exists("dados.xlsx"):
+    st.error("Ficheiro 'dados.xlsx' não encontrado no GitHub.")
+    return None, None, None, None
 
-    lotes["LOTE - QUADRA"] = lotes["LOTE - QUADRA"].astype(str).str.strip()
-    embargos["Lote/Quadra"] = embargos["Lote/Quadra"].astype(str).str.strip()
-    return lotes, embargos
+  try:
+    excel = pd.ExcelFile("dados.xlsx")
+    sheet_names = excel.sheet_names
 
-try:
-    lotes_df, embargos_df = carregar_dados()
-except Exception:
-    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está no GitHub com o nome exato 'dados.xlsx'.")
-    st.stop()
+    df_entregues = pd.read_excel("dados.xlsx", sheet_name=sheet_names[0])
 
-# Campo de busca do porteiro
-busca = st.text_input("🔍 Digite o Lote-Quadra para consultar (Ex: 19-62):", "").strip().upper()
-
-if busca:
-    embargo = embargos_df[embargos_df["Lote/Quadra"] == busca]
-    lote = lotes_df[lotes_df["LOTE - QUADRA"] == busca]
-
-    st.markdown("---")
-
-    if not embargo.empty:
-        d = embargo.iloc[0]
-        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO**")
-        st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
-        st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
-        
-        # Caixa Amarela de Orientação
-        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND")
-
-    elif not lote.empty:
-        d = lote.iloc[0]
-        st.success("✅ **STATUS: LIBERADO - ACESSO TOTAL PERMITIDO**")
-        st.write(f"👤 **Proprietário:** {d['PROPRIETÁRIO']}")
-        st.write(f"📍 **Setor:** {d['SETOR']}")
-
+    if "Embargos" in sheet_names:
+      df_embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos")
+    elif len(sheet_names) > 1:
+      df_embargos = pd.read_excel("dados.xlsx", sheet_name=sheet_names[1])
     else:
-        st.warning("⚠️ **STATUS: LOTE NÃO ENCONTRADO**")
-        st.write("Verifique se o número do Lote-Quadra foi digitado corretamente.")
+      df_embargos = pd.DataFrame()
+
+    col_entregues = identificar_coluna_lote(df_entregues)
+    col_embargos = (
+        identificar_coluna_lote(df_embargos) if not df_embargos.empty else None
+    )
+
+    df_entregues[col_entregues] = (
+        df_entregues[col_entregues].astype(str).str.strip()
+    )
+    if col_embargos and col_embargos in df_embargos.columns:
+      df_embargos[col_embargos] = (
+          df_embargos[col_embargos].astype(str).str.strip()
+      )
+
+    return df_entregues, df_embargos, col_entregues, col_embargos
+  except Exception as e:
+    st.error(f"Erro ao ler a planilha Excel: {e}")
+    return None, None, None, None
+
+
+# Botão no topo para forçar o recarregamento dos dados do GitHub
+if st.button("🔄 Recarregar / Atualizar Planilha"):
+  st.cache_data.clear()
+  st.success("Memória atualizada! A carregar novos dados...")
+  st.rerun()
+
+# Carrega as tabelas
+df_entregues, df_embargos, col_entregues, col_embargos = carregar_dados()
+
+if df_entregues is not None:
+  lote_busca = st.text_input(
+      "Digite o Quadra-Lote (Exemplo: 27-1):", ""
+  ).strip()
+
+  if lote_busca:
+    embargado = pd.DataFrame()
+    if df_embargos is not None and not df_embargos.empty and col_embargos:
+      embargado = df_embargos[df_embargos[col_embargos] == lote_busca]
+
+    if not embargado.empty:
+      st.error("🚨 ATENÇÃO: LOTE EMBARGADO / ACESSO BLOQUEADO")
+      st.markdown("### Detalhes do Bloqueio:")
+      st.dataframe(embargado, use_container_width=True)
+    else:
+      entregue = df_entregues[df_entregues[col_entregues] == lote_busca]
+
+      if not entregue.empty:
+        st.success("✅ ACESSO LIBERADO")
+        st.markdown("### Informações do Lote:")
+        st.dataframe(entregue, use_container_width=True)
+      else:
+        st.warning(
+            "⚠️ ATENÇÃO: Lote não encontrado na base de entregues/liberados."
+        )
+
+st.markdown("---")
+st.caption("Grupo Status — Controle de Acesso Portaria Bougainville Belém")
