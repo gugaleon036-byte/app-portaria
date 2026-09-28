@@ -1,14 +1,14 @@
 import pandas as pd
 import streamlit as st
 
-# Configuração da página
+# Configuração da página com o ícone do Grupo Status na aba/aplicação
 st.set_page_config(
     page_title="Bougainville Belém | Grupo Status",
     page_icon="https://raw.githubusercontent.com/gugaleon036-byte/app-portaria/main/logo.png",
     layout="centered"
 )
 
-# Estilização CSS com a imagem de fundo e logo em destaque
+# Estilização CSS
 st.markdown("""
     <style>
     /* Ocultar menus nativos */
@@ -153,7 +153,7 @@ if busca:
 
     if not embargo.empty:
         d = embargo.iloc[0]
-        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUEADO**")
+        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO**")
         st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
         st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
         
