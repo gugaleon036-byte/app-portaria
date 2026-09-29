@@ -129,6 +129,12 @@ st.markdown("""
 
 # Barra Lateral Informativa
 with st.sidebar:
+    # --- BOTÃO PARA RECARREGAR BASE DE DADOS ---
+    if st.button("🔄 Recarregar / Atualizar Planilha", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
+    st.markdown("---")
+    
     st.markdown("### ⚙️ Central do Cliente")
     st.markdown("**Grupo Status**")
     st.info("Para dúvidas ou regularização de embargos, oriente o cliente a entrar em contato com a administração.")
