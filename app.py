@@ -136,44 +136,25 @@ with st.sidebar:
     st.markdown("📞 **Atendimento:** (91) 3210-0000")
     st.markdown("🌐 **Site:** [grupostatus.com.br](https://www.grupostatus.com.br)")
 
-# Carregamento dos dados com tratamento dinâmico de cabeçalho
+# Carregamento seguro dos dados
 @st.cache_data(ttl=10)
 def carregar_dados():
     xls = pd.ExcelFile("dados.xlsx")
     
-    # Processamento da aba Lote Entregues
-    df_raw_lotes = pd.read_excel(xls, sheet_name="Lote Entregues", header=None)
-    header_row_lotes = 4
-    for idx, row in df_raw_lotes.iloc[:10].iterrows():
-        row_str = row.astype(str).str.upper().tolist()
-        if any("LOTE" in col for col in row_str) and any("PROPRIETÁRIO" in col or "PROPRIETARIO" in col for col in row_str):
-            header_row_lotes = idx
-            break
-            
-    lotes = pd.read_excel(xls, sheet_name="Lote Entregues", skiprows=header_row_lotes)
+    # 1. Carregar Lotes Entregues (Leitura Direta Segura)
+    lotes = pd.read_excel(xls, sheet_name="Lote Entregues", skiprows=4)
     lotes = lotes.dropna(how='all', axis=1).dropna(how='all', axis=0)
     
-    # Processamento da aba Embargos
-    df_raw_emb = pd.read_excel(xls, sheet_name="Embargos", header=None)
-    header_row_emb = 1
-    for idx, row in df_raw_emb.iloc[:5].iterrows():
-        row_str = row.astype(str).str.upper().tolist()
-        if any("LOTE" in col for col in row_str) or any("CLIENTE" in col for col in row_str):
-            header_row_emb = idx
-            break
-            
-    embargos = pd.read_excel(xls, sheet_name="Embargos", skiprows=header_row_emb)
+    # 2. Carregar Embargos (Leitura Direta Segura)
+    embargos = pd.read_excel(xls, sheet_name="Embargos", skiprows=1)
     embargos = embargos.dropna(how='all', axis=1).dropna(how='all', axis=0)
 
-    # Padronização da coluna de busca
-    col_lote_q = [c for c in lotes.columns if "LOTE" in str(c).upper() and "QUADRA" in str(c).upper()]
-    col_lote_l = col_lote_q[0] if col_lote_q else lotes.columns[1]
-    
-    col_emb_q = [c for c in embargos.columns if "LOTE" in str(c).upper()]
-    col_emb_l = col_emb_q[0] if col_emb_q else embargos.columns[3]
+    # Identificação flexível das colunas de Lote-Quadra
+    col_lote = next((c for c in lotes.columns if "LOTE" in str(c).upper() and "QUADRA" in str(c).upper()), lotes.columns[1])
+    col_emb = next((c for c in embargos.columns if "LOTE" in str(c).upper()), embargos.columns[3])
 
-    lotes["BUSCA_LOTE"] = lotes[col_lote_l].astype(str).str.strip().str.upper()
-    embargos["BUSCA_LOTE"] = embargos[col_emb_l].astype(str).str.strip().str.upper()
+    lotes["BUSCA_LOTE"] = lotes[col_lote].astype(str).str.strip().str.upper()
+    embargos["BUSCA_LOTE"] = embargos[col_emb].astype(str).str.strip().str.upper()
     
     return lotes, embargos
 
@@ -192,27 +173,26 @@ if busca:
 
     st.markdown("---")
 
-    # 1. Verificação na aba de Embargos
+    # 1. Checa primeiro na aba de Embargos
     if not embargo.empty:
         d = embargo.iloc[0]
         st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO / EMBARGADO**")
         
-        nome_cli = d.get('Nome do Cliente', d.iloc[4] if len(d) > 4 else 'Não informado')
-        constr = d.get('Construção', d.iloc[1] if len(d) > 1 else 'Não informada')
+        nome_cli = d.get('Nome do Cliente', 'Não informado')
+        constr = d.get('Construção', 'Não informada')
         
         st.write(f"👤 **Cliente / Proprietário:** {nome_cli}")
         st.write(f"🏗️ **Obra / Construção:** {constr}")
-        
         st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND / ADMINISTRAÇÃO")
 
-    # 2. Verificação na aba de Lote Entregues
+    # 2. Checa na aba de Lote Entregues
     elif not lote.empty:
         d = lote.iloc[0]
         
-        # Verificar se existe algum indicador de embargo direto na aba de entregues
-        status_txt = str(d.to_dict()).upper()
+        # Converte a linha inteira para texto para verificar se há indicação de embargo em qualquer coluna
+        dados_texto = " ".join([str(v).upper() for v in d.values if pd.notna(v)])
         
-        if "EMBARGADO" in status_txt or "BLOQUEADO" in status_txt:
+        if "EMBARGADO" in dados_texto or "BLOQUEADO" in dados_texto:
             st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO / EMBARGADO**")
             prop = d.get('PROPRIETÁRIO', d.get('PROPRIETARIO', 'Não informado'))
             st.write(f"👤 **Proprietário:** {prop}")
