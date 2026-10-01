@@ -47,7 +47,7 @@ st.markdown("""
 
     /* Logótipo do Grupo Status em destaque */
     .brand-logo {
-        height: 150px;
+        height: 120px;
         width: auto;
         object-fit: contain;
     }
@@ -129,12 +129,6 @@ st.markdown("""
 
 # Barra Lateral Informativa
 with st.sidebar:
-    # --- BOTÃO PARA RECARREGAR BASE DE DADOS ---
-    if st.button("🔄 Recarregar / Atualizar Planilha", use_container_width=True):
-        st.cache_data.clear()
-        st.rerun()
-    st.markdown("---")
-    
     st.markdown("### ⚙️ Central do Cliente")
     st.markdown("**Grupo Status**")
     st.info("Para dúvidas ou regularização de embargos, oriente o cliente a entrar em contato com a administração.")
@@ -142,46 +136,94 @@ with st.sidebar:
     st.markdown("📞 **Atendimento:** (91) 3210-0000")
     st.markdown("🌐 **Site:** [grupostatus.com.br](https://www.grupostatus.com.br)")
 
-# Carregamento dos dados
-@st.cache_data(ttl=60)
+# Carregamento dos dados com tratamento dinâmico de cabeçalho
+@st.cache_data(ttl=10)
 def carregar_dados():
-    lotes = pd.read_excel("dados.xlsx", sheet_name="Lote Entregues", skiprows=4)
-    embargos = pd.read_excel("dados.xlsx", sheet_name="Embargos", skiprows=1)
+    xls = pd.ExcelFile("dados.xlsx")
+    
+    # Processamento da aba Lote Entregues
+    df_raw_lotes = pd.read_excel(xls, sheet_name="Lote Entregues", header=None)
+    header_row_lotes = 4
+    for idx, row in df_raw_lotes.iloc[:10].iterrows():
+        row_str = row.astype(str).str.upper().tolist()
+        if any("LOTE" in col for col in row_str) and any("PROPRIETÁRIO" in col or "PROPRIETARIO" in col for col in row_str):
+            header_row_lotes = idx
+            break
+            
+    lotes = pd.read_excel(xls, sheet_name="Lote Entregues", skiprows=header_row_lotes)
+    lotes = lotes.dropna(how='all', axis=1).dropna(how='all', axis=0)
+    
+    # Processamento da aba Embargos
+    df_raw_emb = pd.read_excel(xls, sheet_name="Embargos", header=None)
+    header_row_emb = 1
+    for idx, row in df_raw_emb.iloc[:5].iterrows():
+        row_str = row.astype(str).str.upper().tolist()
+        if any("LOTE" in col for col in row_str) or any("CLIENTE" in col for col in row_str):
+            header_row_emb = idx
+            break
+            
+    embargos = pd.read_excel(xls, sheet_name="Embargos", skiprows=header_row_emb)
+    embargos = embargos.dropna(how='all', axis=1).dropna(how='all', axis=0)
 
-    lotes["LOTE - QUADRA"] = lotes["LOTE - QUADRA"].astype(str).str.strip()
-    embargos["Lote/Quadra"] = embargos["Lote/Quadra"].astype(str).str.strip()
+    # Padronização da coluna de busca
+    col_lote_q = [c for c in lotes.columns if "LOTE" in str(c).upper() and "QUADRA" in str(c).upper()]
+    col_lote_l = col_lote_q[0] if col_lote_q else lotes.columns[1]
+    
+    col_emb_q = [c for c in embargos.columns if "LOTE" in str(c).upper()]
+    col_emb_l = col_emb_q[0] if col_emb_q else embargos.columns[3]
+
+    lotes["BUSCA_LOTE"] = lotes[col_lote_l].astype(str).str.strip().str.upper()
+    embargos["BUSCA_LOTE"] = embargos[col_emb_l].astype(str).str.strip().str.upper()
+    
     return lotes, embargos
 
 try:
     lotes_df, embargos_df = carregar_dados()
-except Exception:
-    st.error("⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está no GitHub com o nome exato 'dados.xlsx'.")
+except Exception as e:
+    st.error(f"⚠️ Erro ao carregar o arquivo 'dados.xlsx'. Verifique se o arquivo está no GitHub com o nome exato 'dados.xlsx'. Detalhe: {e}")
     st.stop()
 
 # Campo de busca do porteiro
 busca = st.text_input("🔍 Digite o Lote-Quadra para consultar (Ex: 19-62):", "").strip().upper()
 
 if busca:
-    embargo = embargos_df[embargos_df["Lote/Quadra"] == busca]
-    lote = lotes_df[lotes_df["LOTE - QUADRA"] == busca]
+    embargo = embargos_df[embargos_df["BUSCA_LOTE"] == busca]
+    lote = lotes_df[lotes_df["BUSCA_LOTE"] == busca]
 
     st.markdown("---")
 
+    # 1. Verificação na aba de Embargos
     if not embargo.empty:
         d = embargo.iloc[0]
-        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO**")
-        st.write(f"👤 **Cliente / Proprietário:** {d['Nome do Cliente']}")
-        st.write(f"🏗️ **Obra / Construção:** {d['Construção']}")
+        st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO / EMBARGADO**")
         
-        # Caixa Amarela de Orientação
-        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND")
+        nome_cli = d.get('Nome do Cliente', d.iloc[4] if len(d) > 4 else 'Não informado')
+        constr = d.get('Construção', d.iloc[1] if len(d) > 1 else 'Não informada')
+        
+        st.write(f"👤 **Cliente / Proprietário:** {nome_cli}")
+        st.write(f"🏗️ **Obra / Construção:** {constr}")
+        
+        st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND / ADMINISTRAÇÃO")
 
+    # 2. Verificação na aba de Lote Entregues
     elif not lote.empty:
         d = lote.iloc[0]
-        st.success("✅ **STATUS: LIBERADO - ACESSO TOTAL PERMITIDO**")
-        st.write(f"👤 **Proprietário:** {d['PROPRIETÁRIO']}")
-        st.write(f"📍 **Setor:** {d['SETOR']}")
+        
+        # Verificar se existe algum indicador de embargo direto na aba de entregues
+        status_txt = str(d.to_dict()).upper()
+        
+        if "EMBARGADO" in status_txt or "BLOQUEADO" in status_txt:
+            st.error("🚨 **STATUS DO LOTE: ACESSO BLOQUADO / EMBARGADO**")
+            prop = d.get('PROPRIETÁRIO', d.get('PROPRIETARIO', 'Não informado'))
+            st.write(f"👤 **Proprietário:** {prop}")
+            st.warning("⚠️ **Orientação para a Portaria:** PROCURE INFORMAÇÕES NO STAND / ADMINISTRAÇÃO")
+        else:
+            st.success("✅ **STATUS: LIBERADO - ACESSO TOTAL PERMITIDO**")
+            prop = d.get('PROPRIETÁRIO', d.get('PROPRIETARIO', 'Não informado'))
+            setor = d.get('SETOR', 'Não informado')
+            st.write(f"👤 **Proprietário:** {prop}")
+            st.write(f"📍 **Setor:** {setor}")
 
     else:
         st.warning("⚠️ **STATUS: LOTE NÃO ENCONTRADO**")
-        st.write("Verifique se o número do Lote-Quadra foi digitado corretamente.")
+        st.write("Verifique se o número do Lote-Quadra foi digitado corretamente (Ex: 19-62 ou 5-10).")
